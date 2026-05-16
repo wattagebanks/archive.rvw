@@ -63,7 +63,6 @@ export function GarmentCard({
       session.current = null;
       setDragging(false);
       setDelta({ x: 0, y: 0 });
-      setZLocal(1);
     },
     [commitFromClient]
   );
@@ -119,7 +118,6 @@ export function GarmentCard({
     session.current = null;
     setDragging(false);
     setDelta({ x: 0, y: 0 });
-    setZLocal(1);
   };
 
   return (
