@@ -4,7 +4,7 @@ import {
   CARD_WIDTH,
   cardOuterHeight,
 } from "./cardLayout";
-import { createGarment, LABEL_LOVE } from "./garmentData";
+import { createGarment } from "./garmentData";
 import "./App.css";
 
 const CARD_HEIGHT = cardOuterHeight(CARD_WIDTH);
@@ -136,30 +136,6 @@ export default function App() {
           </a>
         </div>
       </div>
-      <header className="app__header">
-        <div className="app__header-inner">
-          <div className="app__brand">
-            <p className="app__title-kicker">Garment archive</p>
-            <p className="app__tagline">{LABEL_LOVE}</p>
-          </div>
-          <nav className="app__actions" aria-label="Primary">
-            <a className="app__link" href="#" onClick={(e) => e.preventDefault()}>
-              Sign in →
-            </a>
-          </nav>
-        </div>
-        <div className="app__toolbar" aria-label="Filters">
-          <button type="button" className="app__pill app__pill--active">
-            {LABEL_LOVE}
-          </button>
-          <button type="button" className="app__pill">{LABEL_LOVE}</button>
-          <button type="button" className="app__pill">{LABEL_LOVE}</button>
-          <button type="button" className="app__pill">{LABEL_LOVE}</button>
-          <span className="app__count">
-            {count.toLocaleString()} pieces — {LABEL_LOVE}
-          </span>
-        </div>
-      </header>
 
       <main className="app__canvas-wrap" ref={canvasWrapRef}>
         <div
@@ -192,15 +168,6 @@ export default function App() {
           />
         </div>
       </main>
-
-      <footer className="app__sticky-bottom" aria-label="Archive note">
-        <div className="app__sticky-bottom-inner">
-          <p className="app__sticky-bottom-line">{LABEL_LOVE}</p>
-          <p className="app__sticky-bottom-sub">
-            scroll for more · drag any piece · {LABEL_LOVE}
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
