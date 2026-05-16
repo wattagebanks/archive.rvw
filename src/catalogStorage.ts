@@ -76,6 +76,16 @@ export function catalogEntryIsEmpty(e: CatalogEntry): boolean {
   );
 }
 
+/** Next unused slot index for a new catalog entry. */
+export function nextCatalogPieceId(
+  catalog: Record<number, CatalogEntry> = loadCatalog()
+): number {
+  const ids = Object.keys(catalog)
+    .map((k) => Number(k))
+    .filter((n) => Number.isFinite(n) && n >= 0);
+  return ids.length === 0 ? 0 : Math.max(...ids) + 1;
+}
+
 /** Saved slots that have an image — used for the home grid (no empty placeholders). */
 export function listCatalogPieceIds(
   catalog: Record<number, CatalogEntry>

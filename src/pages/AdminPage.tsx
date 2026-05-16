@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   catalogEntryIsEmpty,
   deleteCatalogEntry,
   emptyEntry,
   loadCatalog,
+  nextCatalogPieceId,
   upsertCatalogEntry,
   type CatalogEntry,
 } from "../catalogStorage";
@@ -44,14 +45,27 @@ function Field({
   );
 }
 
-export default function AdminPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const idFromUrl = Number(searchParams.get("id") ?? "0");
-  const initialId =
-    Number.isFinite(idFromUrl) && idFromUrl >= 0 ? idFromUrl : 0;
+function editIdFromSearch(params: URLSearchParams): number | null {
+  const raw = params.get("id");
+  if (raw === null || raw === "") return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
 
-  const [pieceId, setPieceId] = useState(initialId);
-  const [draft, setDraft] = useState<CatalogEntry>(() => emptyEntry());
+export default function AdminPage() {
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const editId = editIdFromSearch(searchParams);
+
+  const [pieceId, setPieceId] = useState(() =>
+    editId !== null ? editId : nextCatalogPieceId()
+  );
+  const [draft, setDraft] = useState<CatalogEntry>(() => {
+    if (editId === null) return emptyEntry();
+    const cat = loadCatalog();
+    return { ...emptyEntry(), ...cat[editId] };
+  });
   const [savedIds, setSavedIds] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
@@ -124,10 +138,17 @@ export default function AdminPage() {
   }, [pieceId]);
 
   useEffect(() => {
-    const n = Number(searchParams.get("id"));
-    if (!Number.isFinite(n) || n < 0) return;
-    setPieceId(n);
-  }, [searchParams]);
+    const id = editIdFromSearch(searchParams);
+    if (id !== null) {
+      setPieceId(id);
+      return;
+    }
+    const nextId = nextCatalogPieceId();
+    setPieceId(nextId);
+    setDraft(emptyEntry());
+    setUploadError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [location.pathname, searchParams]);
 
   const setParamId = useCallback(
     (nextId: number) => {
@@ -137,17 +158,13 @@ export default function AdminPage() {
   );
 
   const resetFormForNewEntry = useCallback(() => {
-    const cat = loadCatalog();
-    const ids = Object.keys(cat)
-      .map((k) => Number(k))
-      .filter((n) => Number.isFinite(n) && n >= 0);
-    const nextId = ids.length === 0 ? 0 : Math.max(...ids) + 1;
+    const nextId = nextCatalogPieceId();
     setDraft(emptyEntry());
     setUploadError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     setPieceId(nextId);
-    setParamId(nextId);
-  }, [setParamId]);
+    setSearchParams({}, { replace: true });
+  }, [setSearchParams]);
 
   const handleSave = useCallback(() => {
     if (catalogEntryIsEmpty(draft)) {
