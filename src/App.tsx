@@ -68,6 +68,10 @@ export default function App() {
     setFreeMap((prev) => ({ ...prev, [id]: pos }));
   }, []);
 
+  const handleReset = useCallback(() => {
+    setFreeMap({});
+  }, []);
+
   const loadCooldown = useRef(0);
 
   useEffect(() => {
@@ -102,10 +106,40 @@ export default function App() {
 
   return (
     <div className="app">
+      <button
+        type="button"
+        className="app__reset"
+        onClick={handleReset}
+        aria-label="Reset layout — snap all pieces back to the grid"
+      >
+        Reset
+      </button>
+      <div className="app__hero" aria-label="Site branding">
+        <h1 className="app__hero-logo">REDFORD VAN WYATT</h1>
+        <div className="app__hero-contact">
+          <a
+            className="app__hero-link app__hero-link--instagram"
+            href="https://www.instagram.com/redfordvanwyatt/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @redfordvanwyatt
+          </a>
+          <span className="app__hero-contact-sep" aria-hidden="true">
+            ·
+          </span>
+          <a
+            className="app__hero-link app__hero-link--email"
+            href="mailto:love@redfordvanwyatt.com"
+          >
+            love@redfordvanwyatt.com
+          </a>
+        </div>
+      </div>
       <header className="app__header">
         <div className="app__header-inner">
           <div className="app__brand">
-            <h1 className="app__title">Garment Archive</h1>
+            <p className="app__title-kicker">Garment archive</p>
             <p className="app__tagline">{LABEL_LOVE}</p>
           </div>
           <nav className="app__actions" aria-label="Primary">
