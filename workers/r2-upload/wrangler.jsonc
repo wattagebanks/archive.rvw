@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "archive-rvw-upload",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-01",
+  "r2_buckets": [
+    {
+      "binding": "ARCHIVE",
+      "bucket_name": "archive-rvw-media"
+    }
+  ],
+  "vars": {
+    "PUBLIC_BASE_URL": ""
+  }
+}

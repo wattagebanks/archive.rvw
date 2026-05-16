@@ -1,0 +1,4 @@
+# Copy to .dev.vars (gitignored) for local `npm run dev:upload`
+# UPLOAD_SECRET is optional locally; set in production via `wrangler secret put UPLOAD_SECRET`
+
+UPLOAD_SECRET=

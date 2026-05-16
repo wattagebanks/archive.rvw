@@ -31,6 +31,36 @@
   outline-offset: 3px;
 }
 
+.app__admin {
+  position: fixed;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  z-index: 10000;
+  margin: 0;
+  padding: 8px 12px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px rgba(20, 20, 20, 0.06);
+}
+
+.app__admin:hover {
+  color: var(--ink);
+  border-color: rgba(20, 20, 20, 0.14);
+}
+
+.app__admin:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .app__canvas-wrap {
   flex: 1;
   padding: 8px 22px calc(16px + env(safe-area-inset-bottom, 0px));
@@ -110,4 +140,3 @@
   pointer-events: none;
   opacity: 0;
 }
-
