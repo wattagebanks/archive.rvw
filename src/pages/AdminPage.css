@@ -158,6 +158,92 @@
   gap: 1rem;
 }
 
+.admin-garment {
+  padding: 1.2rem 1.35rem 1.1rem;
+  background: color-mix(in oklab, var(--surface) 50%, var(--bg));
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.admin-garment__title {
+  margin: 0 0 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.admin-garment__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.admin-garment__row--full {
+  grid-template-columns: 1fr;
+}
+
+.admin-garment__input {
+  width: 100%;
+  margin: 0;
+  padding: 9px 11px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+  border-radius: 8px;
+}
+
+.admin-garment__input::placeholder {
+  color: color-mix(in oklab, var(--muted) 72%, transparent);
+}
+
+.admin-garment__input:focus {
+  outline: none;
+  border-color: rgba(20, 20, 20, 0.22);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--line) 65%, transparent);
+}
+
+.admin-garment__input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: color-mix(in oklab, var(--surface) 70%, var(--bg));
+}
+
+.admin-garment__input--price {
+  flex: 0 1 160px;
+  min-width: 120px;
+}
+
+.admin-garment__price-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.admin-garment__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-garment__check input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+
 .admin-field {
   display: flex;
   flex-direction: column;

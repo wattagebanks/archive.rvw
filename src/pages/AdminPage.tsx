@@ -12,6 +12,35 @@ import {
 import { getUploadApiBase, uploadGarmentImageToR2 } from "../lib/r2Upload";
 import "./AdminPage.css";
 
+function GarmentInput({
+  id,
+  placeholder,
+  value,
+  onChange,
+  disabled,
+  className,
+}: {
+  id: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+  className?: string;
+}) {
+  return (
+    <input
+      id={id}
+      className={className ?? "admin-garment__input"}
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
+      autoComplete="off"
+    />
+  );
+}
+
 function Field({
   id,
   label,
@@ -274,41 +303,98 @@ export default function AdminPage() {
         </aside>
 
         <section className="admin__form-section" aria-label="Piece details">
-          <Field
-            id="admin-title"
-            label="Title"
-            value={draft.title}
-            onChange={(title) => setDraft((d) => ({ ...d, title }))}
-            hint="Shown under the thumbnail and as the popup heading."
-          />
-          <Field
-            id="admin-material"
-            label="Material / type"
-            value={draft.materialType}
-            onChange={(materialType) =>
-              setDraft((d) => ({ ...d, materialType }))
-            }
-          />
-          <Field
-            id="admin-fabric"
-            label="Fabric contents"
-            value={draft.fabricContents}
-            onChange={(fabricContents) =>
-              setDraft((d) => ({ ...d, fabricContents }))
-            }
-          />
-          <Field
-            id="admin-color"
-            label="Color"
-            value={draft.color}
-            onChange={(color) => setDraft((d) => ({ ...d, color }))}
-          />
-          <Field
-            id="admin-size"
-            label="Size"
-            value={draft.size}
-            onChange={(size) => setDraft((d) => ({ ...d, size }))}
-          />
+          <div className="admin-garment">
+            <h2 className="admin-garment__title">Add garment</h2>
+            <div className="admin-garment__row">
+              <GarmentInput
+                id="admin-sku"
+                placeholder="SKU (unique)"
+                value={draft.sku}
+                onChange={(sku) => setDraft((d) => ({ ...d, sku }))}
+              />
+              <GarmentInput
+                id="admin-title"
+                placeholder="Title"
+                value={draft.title}
+                onChange={(title) => setDraft((d) => ({ ...d, title }))}
+              />
+            </div>
+            <div className="admin-garment__row">
+              <GarmentInput
+                id="admin-color"
+                placeholder="Color"
+                value={draft.color}
+                onChange={(color) => setDraft((d) => ({ ...d, color }))}
+              />
+              <GarmentInput
+                id="admin-shell"
+                placeholder="Shell"
+                value={draft.shell}
+                onChange={(shell) => setDraft((d) => ({ ...d, shell }))}
+              />
+            </div>
+            <div className="admin-garment__row">
+              <GarmentInput
+                id="admin-lining"
+                placeholder="Lining"
+                value={draft.lining}
+                onChange={(lining) => setDraft((d) => ({ ...d, lining }))}
+              />
+              <GarmentInput
+                id="admin-custom-fit"
+                placeholder="Custom Fit"
+                value={draft.customFit}
+                onChange={(customFit) => setDraft((d) => ({ ...d, customFit }))}
+              />
+            </div>
+            <div className="admin-garment__row">
+              <GarmentInput
+                id="admin-date-made"
+                placeholder="Date made (e.g. 2026-05-12)"
+                value={draft.dateMade}
+                onChange={(dateMade) => setDraft((d) => ({ ...d, dateMade }))}
+              />
+              <GarmentInput
+                id="admin-year"
+                placeholder="Year"
+                value={draft.year}
+                onChange={(year) => setDraft((d) => ({ ...d, year }))}
+              />
+            </div>
+            <div className="admin-garment__row admin-garment__row--full">
+              <GarmentInput
+                id="admin-collection"
+                placeholder="Collection"
+                value={draft.collection}
+                onChange={(collection) =>
+                  setDraft((d) => ({ ...d, collection }))
+                }
+              />
+            </div>
+            <div className="admin-garment__price-row">
+              <label className="admin-garment__check">
+                <input
+                  type="checkbox"
+                  checked={draft.showPrice}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, showPrice: e.target.checked }))
+                  }
+                />
+                <span>show price</span>
+              </label>
+              <GarmentInput
+                id="admin-price"
+                placeholder="Price (USD)"
+                value={draft.price}
+                onChange={(price) => setDraft((d) => ({ ...d, price }))}
+                disabled={!draft.showPrice}
+                className="admin-garment__input admin-garment__input--price"
+              />
+            </div>
+          </div>
+          <p className="admin-field__hint">
+            Title appears under the thumbnail and as the detail popup heading.
+          </p>
           <div className="admin__upload">
             <span className="admin-field__label" id="admin-r2-upload-label">
               Image file (R2)

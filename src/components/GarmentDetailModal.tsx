@@ -31,6 +31,24 @@ export function GarmentDetailModal({ garment, onClose }: Props) {
 
   const { details } = garment;
   const heading = details.title.trim() || `Piece #${garment.id}`;
+  const dateLine = [details.dateMade, details.year].filter(Boolean).join(" · ");
+  const priceDisplay =
+    details.showPrice && details.price
+      ? details.price.startsWith("$")
+        ? details.price
+        : `$${details.price}`
+      : "";
+
+  const hasDetails =
+    details.sku ||
+    details.title ||
+    details.color ||
+    details.shell ||
+    details.lining ||
+    details.customFit ||
+    dateLine ||
+    details.collection ||
+    priceDisplay;
 
   return (
     <div
@@ -56,20 +74,20 @@ export function GarmentDetailModal({ garment, onClose }: Props) {
           {heading}
         </h2>
         <dl className="garment-detail-modal__list">
-          <Row label="Material" value={details.materialType} />
-          <Row label="Fabric contents" value={details.fabricContents} />
+          <Row label="SKU" value={details.sku} />
           <Row label="Color" value={details.color} />
-          <Row label="Size" value={details.size} />
+          <Row label="Shell" value={details.shell} />
+          <Row label="Lining" value={details.lining} />
+          <Row label="Custom fit" value={details.customFit} />
+          <Row label="Date made" value={dateLine} />
+          <Row label="Collection" value={details.collection} />
+          <Row label="Price" value={priceDisplay} />
         </dl>
-        {!details.materialType &&
-          !details.fabricContents &&
-          !details.color &&
-          !details.size &&
-          !details.title.trim() && (
-            <p className="garment-detail-modal__empty">
-              Details for this piece can be added in Admin.
-            </p>
-          )}
+        {!hasDetails && (
+          <p className="garment-detail-modal__empty">
+            Details for this piece can be added in Admin.
+          </p>
+        )}
       </dialog>
     </div>
   );

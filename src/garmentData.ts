@@ -3,11 +3,17 @@ import { emptyEntry, type CatalogEntry } from "./catalogStorage";
 export const LABEL_LOVE = "we love i love you love" as const;
 
 export type GarmentDetails = {
+  sku: string;
   title: string;
-  materialType: string;
-  fabricContents: string;
   color: string;
-  size: string;
+  shell: string;
+  lining: string;
+  customFit: string;
+  dateMade: string;
+  year: string;
+  collection: string;
+  price: string;
+  showPrice: boolean;
 };
 
 export type Garment = {
@@ -28,11 +34,17 @@ export function createGarment(
     id,
     imageUrl,
     details: {
+      sku: row.sku.trim(),
       title: row.title.trim(),
-      materialType: row.materialType.trim(),
-      fabricContents: row.fabricContents.trim(),
       color: row.color.trim(),
-      size: row.size.trim(),
+      shell: row.shell.trim(),
+      lining: row.lining.trim(),
+      customFit: row.customFit.trim(),
+      dateMade: row.dateMade.trim(),
+      year: row.year.trim(),
+      collection: row.collection.trim(),
+      price: row.price.trim(),
+      showPrice: row.showPrice,
     },
   };
 }

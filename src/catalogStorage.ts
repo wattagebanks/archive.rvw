@@ -2,23 +2,66 @@ export const CATALOG_STORAGE_KEY = "archive-rvw-catalog";
 export const CATALOG_UPDATE_EVENT = "archive-rvw-catalog-updated";
 
 export type CatalogEntry = {
+  sku: string;
   title: string;
-  materialType: string;
-  fabricContents: string;
   color: string;
-  size: string;
+  shell: string;
+  lining: string;
+  customFit: string;
+  dateMade: string;
+  year: string;
+  collection: string;
+  price: string;
+  showPrice: boolean;
   /** Full image URL */
   imageUrl: string;
 };
 
 export function emptyEntry(): CatalogEntry {
   return {
+    sku: "",
     title: "",
-    materialType: "",
-    fabricContents: "",
     color: "",
-    size: "",
+    shell: "",
+    lining: "",
+    customFit: "",
+    dateMade: "",
+    year: "",
+    collection: "",
+    price: "",
+    showPrice: false,
     imageUrl: "",
+  };
+}
+
+type LegacyCatalogFields = {
+  materialType?: string;
+  fabricContents?: string;
+  size?: string;
+};
+
+function normalizeEntry(
+  raw: Partial<CatalogEntry> & LegacyCatalogFields
+): CatalogEntry {
+  const shell =
+    raw.shell?.trim() ||
+    raw.fabricContents?.trim() ||
+    raw.materialType?.trim() ||
+    "";
+  const customFit = raw.customFit?.trim() || raw.size?.trim() || "";
+  return {
+    sku: raw.sku?.trim() ?? "",
+    title: raw.title?.trim() ?? "",
+    color: raw.color?.trim() ?? "",
+    shell,
+    lining: raw.lining?.trim() ?? "",
+    customFit,
+    dateMade: raw.dateMade?.trim() ?? "",
+    year: raw.year?.trim() ?? "",
+    collection: raw.collection?.trim() ?? "",
+    price: raw.price?.trim() ?? "",
+    showPrice: Boolean(raw.showPrice),
+    imageUrl: raw.imageUrl?.trim() ?? "",
   };
 }
 
@@ -26,12 +69,15 @@ export function loadCatalog(): Record<number, CatalogEntry> {
   try {
     const raw = localStorage.getItem(CATALOG_STORAGE_KEY);
     if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, Partial<CatalogEntry>>;
+    const parsed = JSON.parse(raw) as Record<
+      string,
+      Partial<CatalogEntry> & LegacyCatalogFields
+    >;
     const out: Record<number, CatalogEntry> = {};
     for (const [k, v] of Object.entries(parsed)) {
       const id = Number(k);
       if (!Number.isFinite(id) || id < 0) continue;
-      out[id] = { ...emptyEntry(), ...v };
+      out[id] = normalizeEntry(v);
     }
     return out;
   } catch {
@@ -53,7 +99,7 @@ export function upsertCatalogEntry(
   patch: Partial<CatalogEntry>
 ): CatalogEntry {
   const all = loadCatalog();
-  const next = { ...emptyEntry(), ...all[id], ...patch };
+  const next = normalizeEntry({ ...emptyEntry(), ...all[id], ...patch });
   all[id] = next;
   persist(all);
   return next;
@@ -67,11 +113,16 @@ export function deleteCatalogEntry(id: number): void {
 
 export function catalogEntryIsEmpty(e: CatalogEntry): boolean {
   return (
+    !e.sku.trim() &&
     !e.title.trim() &&
-    !e.materialType.trim() &&
-    !e.fabricContents.trim() &&
     !e.color.trim() &&
-    !e.size.trim() &&
+    !e.shell.trim() &&
+    !e.lining.trim() &&
+    !e.customFit.trim() &&
+    !e.dateMade.trim() &&
+    !e.year.trim() &&
+    !e.collection.trim() &&
+    !e.price.trim() &&
     !e.imageUrl.trim()
   );
 }
