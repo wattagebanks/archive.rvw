@@ -131,12 +131,3 @@
 .app__hero-link:hover {
   color: var(--ink);
 }
-
-.app__sentinel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  pointer-events: none;
-  opacity: 0;
-}

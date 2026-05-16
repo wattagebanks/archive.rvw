@@ -44,12 +44,7 @@ export function GarmentCard({
   const [zLocal, setZLocal] = useState(1);
 
   const mediaPx = cardMediaHeight(width);
-  const innerPx = width - 2;
-  const imgSrc = garmentImageSrc(
-    garment,
-    innerPx * 2,
-    mediaPx * 2
-  );
+  const imgSrc = garmentImageSrc(garment);
 
   const captionText =
     garment.details.title.trim().length > 0
@@ -166,14 +161,16 @@ export function GarmentCard({
     >
       <div className="garment-card__frame">
         <div className="garment-card__media" style={{ height: mediaPx }}>
-          <img
-            src={imgSrc}
-            alt={captionText}
-            className="garment-card__img"
-            draggable={false}
-            loading="lazy"
-            decoding="async"
-          />
+          {imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={captionText}
+              className="garment-card__img"
+              draggable={false}
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
         </div>
       </div>
       <div className="garment-card__caption">

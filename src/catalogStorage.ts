@@ -7,10 +7,8 @@ export type CatalogEntry = {
   fabricContents: string;
   color: string;
   size: string;
-  /** Full image URL; empty uses Picsum with imageSeed */
+  /** Full image URL */
   imageUrl: string;
-  /** Passed to picsum /seed/ when imageUrl is empty */
-  imageSeed: string;
 };
 
 export function emptyEntry(): CatalogEntry {
@@ -21,7 +19,6 @@ export function emptyEntry(): CatalogEntry {
     color: "",
     size: "",
     imageUrl: "",
-    imageSeed: "",
   };
 }
 
@@ -75,7 +72,20 @@ export function catalogEntryIsEmpty(e: CatalogEntry): boolean {
     !e.fabricContents.trim() &&
     !e.color.trim() &&
     !e.size.trim() &&
-    !e.imageUrl.trim() &&
-    !e.imageSeed.trim()
+    !e.imageUrl.trim()
   );
+}
+
+/** Saved slots that have an image — used for the home grid (no empty placeholders). */
+export function listCatalogPieceIds(
+  catalog: Record<number, CatalogEntry>
+): number[] {
+  return Object.keys(catalog)
+    .map((k) => Number(k))
+    .filter((id) => Number.isFinite(id) && id >= 0)
+    .filter((id) => {
+      const e = catalog[id];
+      return e != null && !catalogEntryIsEmpty(e) && e.imageUrl.trim().length > 0;
+    })
+    .sort((a, b) => a - b);
 }

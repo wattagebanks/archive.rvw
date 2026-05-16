@@ -12,8 +12,7 @@ export type GarmentDetails = {
 
 export type Garment = {
   id: number;
-  imageSeed: string;
-  /** Custom URL, or null to derive from imageSeed via Picsum */
+  /** Saved image URL, or null when none uploaded */
   imageUrl: string | null;
   details: GarmentDetails;
 };
@@ -23,12 +22,10 @@ export function createGarment(
   catalog: Record<number, CatalogEntry>
 ): Garment {
   const row = catalog[id] ?? emptyEntry();
-  const imageSeed = row.imageSeed.trim() || `garment-${id}`;
   const trimmedUrl = row.imageUrl.trim();
   const imageUrl = trimmedUrl.length > 0 ? trimmedUrl : null;
   return {
     id,
-    imageSeed,
     imageUrl,
     details: {
       title: row.title.trim(),
@@ -40,13 +37,6 @@ export function createGarment(
   };
 }
 
-export function garmentImageSrc(
-  garment: Garment,
-  widthPx: number,
-  heightPx: number
-): string {
-  if (garment.imageUrl) return garment.imageUrl;
-  return `https://picsum.photos/seed/${encodeURIComponent(
-    garment.imageSeed
-  )}/${Math.round(widthPx)}/${Math.round(heightPx)}`;
+export function garmentImageSrc(garment: Garment): string | null {
+  return garment.imageUrl;
 }

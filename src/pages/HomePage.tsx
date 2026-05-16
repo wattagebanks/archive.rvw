@@ -8,6 +8,7 @@ import {
   ringOffsetsAroundCenter,
 } from "../cardLayout";
 import { createGarment, type Garment } from "../garmentData";
+import { listCatalogPieceIds } from "../catalogStorage";
 import { useCatalog } from "../hooks/useCatalog";
 import "./HomePage.css";
 
@@ -15,8 +16,6 @@ const CARD_HEIGHT = cardOuterHeight(CARD_WIDTH);
 const GAP_X = 14;
 const GAP_Y = 20;
 const PADDING_X = 8;
-const INITIAL_BATCH = 24;
-const LOAD_MORE = 18;
 
 function useContainerWidth<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -42,7 +41,6 @@ export default function HomePage() {
   const catalog = useCatalog();
   const { ref: canvasWrapRef, width: wrapWidth } =
     useContainerWidth<HTMLDivElement>();
-  const [count, setCount] = useState(INITIAL_BATCH);
   const [freeMap, setFreeMap] = useState<
     Record<number, { x: number; y: number }>
   >({});
@@ -50,8 +48,10 @@ export default function HomePage() {
     typeof window !== "undefined" ? window.innerHeight * 0.5 : 520
   );
   const zRef = useRef(50);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [detailGarment, setDetailGarment] = useState<Garment | null>(null);
+
+  const pieceIds = useMemo(() => listCatalogPieceIds(catalog), [catalog]);
+  const count = pieceIds.length;
 
   useEffect(() => {
     const onResize = () => setViewMidY(window.innerHeight * 0.5);
@@ -106,8 +106,8 @@ export default function HomePage() {
   const canvasContentHeight = shiftedMaxBottom;
 
   const garments = useMemo(
-    () => Array.from({ length: count }, (_, i) => createGarment(i, catalog)),
-    [count, catalog]
+    () => pieceIds.map((id) => createGarment(id, catalog)),
+    [pieceIds, catalog]
   );
 
   const bringToFront = useCallback(() => {
@@ -129,25 +129,6 @@ export default function HomePage() {
 
   const closeDetail = useCallback(() => setDetailGarment(null), []);
 
-  const loadCooldown = useRef(0);
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((en) => en.isIntersecting)) return;
-        const now = performance.now();
-        if (now - loadCooldown.current < 400) return;
-        loadCooldown.current = now;
-        setCount((c) => c + LOAD_MORE);
-      },
-      { root: null, rootMargin: "320px", threshold: 0 }
-    );
-    obs.observe(sentinel);
-    return () => obs.disconnect();
-  }, [count]);
-
   const gridXYWithPad = useCallback(
     (index: number) => {
       const g = gridXY(index);
@@ -156,7 +137,7 @@ export default function HomePage() {
     [gridXY, padTop]
   );
 
-  const sentinelTop = canvasContentHeight + Math.max(GAP_Y * 3, 48);
+  const canvasHeight = canvasContentHeight + PADDING_X * 2;
 
   return (
     <div className="app">
@@ -203,7 +184,7 @@ export default function HomePage() {
           className="app__canvas"
           style={{
             width: canvasStyledWidth,
-            height: sentinelTop + 80,
+            height: Math.max(canvasHeight, viewMidY + CARD_HEIGHT),
           }}
         >
           {garments.map((g, index) => {
@@ -223,11 +204,6 @@ export default function HomePage() {
               />
             );
           })}
-          <div
-            ref={sentinelRef}
-            className="app__sentinel"
-            style={{ top: sentinelTop }}
-          />
         </div>
       </main>
       <GarmentDetailModal garment={detailGarment} onClose={closeDetail} />

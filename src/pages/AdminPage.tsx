@@ -136,14 +136,29 @@ export default function AdminPage() {
     [setSearchParams]
   );
 
+  const resetFormForNewEntry = useCallback(() => {
+    const cat = loadCatalog();
+    const ids = Object.keys(cat)
+      .map((k) => Number(k))
+      .filter((n) => Number.isFinite(n) && n >= 0);
+    const nextId = ids.length === 0 ? 0 : Math.max(...ids) + 1;
+    setDraft(emptyEntry());
+    setUploadError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setPieceId(nextId);
+    setParamId(nextId);
+  }, [setParamId]);
+
   const handleSave = useCallback(() => {
     if (catalogEntryIsEmpty(draft)) {
       deleteCatalogEntry(pieceId);
-    } else {
-      upsertCatalogEntry(pieceId, draft);
+      refreshSavedIds();
+      return;
     }
+    upsertCatalogEntry(pieceId, draft);
     refreshSavedIds();
-  }, [draft, pieceId, refreshSavedIds]);
+    resetFormForNewEntry();
+  }, [draft, pieceId, refreshSavedIds, resetFormForNewEntry]);
 
   const handleClear = useCallback(() => {
     deleteCatalogEntry(pieceId);
@@ -164,7 +179,7 @@ export default function AdminPage() {
           <p className="admin__lede">
             Slot index matches the home grid order: 0 is the first ring slot,
             then 1, 2, … Upload an image to send it to R2 (via your Worker),
-            or paste an image URL, or leave both blank and set a Picsum seed.
+            or paste an image URL.
           </p>
         </div>
         <Link className="admin__home" to="/">
@@ -326,14 +341,6 @@ export default function AdminPage() {
             onChange={(imageUrl) => setDraft((d) => ({ ...d, imageUrl }))}
             hint="Filled automatically after R2 upload, or paste any image URL."
           />
-          <Field
-            id="admin-image-seed"
-            label="Picsum seed"
-            value={draft.imageSeed}
-            onChange={(imageSeed) => setDraft((d) => ({ ...d, imageSeed }))}
-            hint="Optional. Only used when image URL is empty. Defaults to garment-N."
-          />
-
           <div className="admin__actions">
             <button type="button" className="admin__primary" onClick={handleSave}>
               Save piece
