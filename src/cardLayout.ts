@@ -31,3 +31,26 @@ function frameOuterHeightPx(outerWidth: number): number {
 export function cardOuterHeight(outerWidth: number): number {
   return frameOuterHeightPx(outerWidth) + CARD_FOOTER_H;
 }
+
+/** One cell on the integer perimeter of the Chebyshev-(distance r) square (skips r=0). */
+export function* chebyshevRingCells(
+  r: number
+): Generator<{ dx: number; dy: number }> {
+  if (r < 1) return;
+  for (let x = -r; x <= r; x++) yield { dx: x, dy: -r };
+  for (let y = -r + 1; y <= r; y++) yield { dx: r, dy: y };
+  for (let x = r - 1; x >= -r; x--) yield { dx: x, dy: r };
+  for (let y = r - 1; y >= -r + 1; y--) yield { dx: -r, dy: y };
+}
+
+/** Square rings from the origin — good for filling “around” a center logo (no card at 0,0). */
+export function ringOffsetsAroundCenter(n: number): { dx: number; dy: number }[] {
+  const out: { dx: number; dy: number }[] = [];
+  for (let r = 1; out.length < n; r++) {
+    for (const cell of chebyshevRingCells(r)) {
+      out.push(cell);
+      if (out.length >= n) break;
+    }
+  }
+  return out;
+}

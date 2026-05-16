@@ -3,6 +3,7 @@ import { GarmentCard } from "./components/GarmentCard";
 import {
   CARD_WIDTH,
   cardOuterHeight,
+  ringOffsetsAroundCenter,
 } from "./cardLayout";
 import { createGarment } from "./garmentData";
 import "./App.css";
@@ -41,18 +42,63 @@ export default function App() {
   const [freeMap, setFreeMap] = useState<
     Record<number, { x: number; y: number }>
   >({});
+  const [viewMidY, setViewMidY] = useState(() =>
+    typeof window !== "undefined" ? window.innerHeight * 0.5 : 520
+  );
   const zRef = useRef(50);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const cols = useMemo(() => {
-    const inner = Math.max(240, wrapWidth - PADDING_X * 2);
-    const cell = CARD_WIDTH + GAP_X;
-    return Math.max(1, Math.floor((inner + GAP_X) / cell));
-  }, [wrapWidth]);
+  useEffect(() => {
+    const onResize = () => setViewMidY(window.innerHeight * 0.5);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-  const canvasWidth = cols * (CARD_WIDTH + GAP_X) - GAP_X;
-  const rows = Math.ceil(count / cols);
-  const canvasHeight = rows * (CARD_HEIGHT + GAP_Y) - GAP_Y;
+  const ringOffsets = useMemo(() => ringOffsetsAroundCenter(count), [count]);
+
+  let minDx = 0;
+  let maxDx = 0;
+  let minDy = 0;
+  let maxDy = 0;
+  for (const { dx, dy } of ringOffsets) {
+    minDx = Math.min(minDx, dx);
+    maxDx = Math.max(maxDx, dx);
+    minDy = Math.min(minDy, dy);
+    maxDy = Math.max(maxDy, dy);
+  }
+
+  const stepX = CARD_WIDTH + GAP_X;
+  const stepY = CARD_HEIGHT + GAP_Y;
+  const spanW = (maxDx - minDx) * stepX + CARD_WIDTH;
+  const minCanvasW = Math.max(240, wrapWidth - PADDING_X * 2);
+  const canvasInnerW = Math.max(spanW, minCanvasW);
+  const canvasStyledWidth = canvasInnerW + PADDING_X * 2;
+  const midX = canvasStyledWidth / 2;
+
+  const gridXY = useCallback(
+    (index: number) => {
+      const { dx, dy } = ringOffsets[index] ?? { dx: 0, dy: 0 };
+      const rawLeft = midX - CARD_WIDTH / 2 + dx * stepX;
+      const rawTop = viewMidY - CARD_HEIGHT / 2 + dy * stepY;
+      return { x: rawLeft, y: rawTop };
+    },
+    [ringOffsets, midX, viewMidY, stepX, stepY]
+  );
+
+  let minTop = Infinity;
+  let maxBottom = -Infinity;
+  for (let i = 0; i < count; i++) {
+    const { y } = gridXY(i);
+    minTop = Math.min(minTop, y);
+    maxBottom = Math.max(maxBottom, y + CARD_HEIGHT);
+  }
+  if (count === 0) {
+    minTop = 0;
+    maxBottom = 0;
+  }
+  const padTop = Math.max(0, PADDING_X - minTop);
+  const shiftedMaxBottom = maxBottom + padTop;
+  const canvasContentHeight = shiftedMaxBottom;
 
   const garments = useMemo(
     () => Array.from({ length: count }, (_, i) => createGarment(i)),
@@ -89,20 +135,17 @@ export default function App() {
     );
     obs.observe(sentinel);
     return () => obs.disconnect();
-  }, [cols, rows, count]);
+  }, [count]);
 
-  const gridXY = useCallback(
+  const gridXYWithPad = useCallback(
     (index: number) => {
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      const x = PADDING_X + col * (CARD_WIDTH + GAP_X);
-      const y = row * (CARD_HEIGHT + GAP_Y);
-      return { x, y };
+      const g = gridXY(index);
+      return { x: g.x, y: g.y + padTop };
     },
-    [cols]
+    [gridXY, padTop]
   );
 
-  const sentinelTop = canvasHeight + Math.max(GAP_Y * 3, 48);
+  const sentinelTop = canvasContentHeight + Math.max(GAP_Y * 3, 48);
 
   return (
     <div className="app">
@@ -141,12 +184,12 @@ export default function App() {
         <div
           className="app__canvas"
           style={{
-            width: canvasWidth + PADDING_X * 2,
+            width: canvasStyledWidth,
             height: sentinelTop + 80,
           }}
         >
           {garments.map((g, index) => {
-            const grid = gridXY(index);
+            const grid = gridXYWithPad(index);
             return (
               <GarmentCard
                 key={g.id}
