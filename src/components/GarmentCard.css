@@ -1,0 +1,94 @@
+.garment-card {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: transparent;
+  overflow: visible;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.garment-card:active {
+  cursor: grabbing;
+}
+
+/* Border + rounding only wrap the photo (matches ciggies-style reference). */
+.garment-card__frame {
+  flex: 0 0 auto;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 26px rgba(20, 20, 20, 0.06);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.garment-card:active .garment-card__frame {
+  box-shadow: 0 16px 40px rgba(20, 20, 20, 0.12);
+  border-color: rgba(20, 20, 20, 0.14);
+}
+
+.garment-card__media {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #e8e4dc;
+}
+
+/* Thin edge under photo + slight lift — like the reference separation. */
+.garment-card__media::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: rgba(20, 20, 20, 0.1);
+}
+
+.garment-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Caption sits on the canvas — no tinted panel behind the words. */
+.garment-card__caption {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  padding: 0 4px;
+  text-align: center;
+  background: transparent;
+}
+
+.garment-card__label {
+  margin: 0;
+  width: 100%;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  min-height: calc(2 * 1.35em);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: color-mix(in oklab, var(--ink) 50%, transparent);
+}
+
+.garment-card__hint {
+  margin: 3px 0 0;
+  font-size: 7px;
+  line-height: 1.15;
+  font-family: var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--muted) 42%, transparent);
+}
